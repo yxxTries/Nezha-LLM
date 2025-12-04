@@ -24,9 +24,14 @@ def load_model(model_name="Qwen/Qwen2-0.5B-Instruct"):
         model = AutoModelForCausalLM.from_pretrained(
             local_path,
             local_files_only=True,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
             device_map="auto" if torch.cuda.is_available() else None
         )
+        
+        # Compile model for faster inference (PyTorch 2.0+)
+        if hasattr(torch, 'compile'):
+            print("[LLM] Compiling model for faster inference...")
+            model = torch.compile(model)
     else:
         raise FileNotFoundError(f"Model not found locally. Download using -> |from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen2-0.5B-Instruct', cache_dir='desiredLocation')|")
     
@@ -53,7 +58,10 @@ def run_inference(text, tokenizer, model):
     
     output_ids = model.generate(
         **inputs,
-        max_new_tokens=256,
+        max_new_tokens=60,
+        num_beams=1,
+        do_sample=False,
+        use_cache=True,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id
     )
