@@ -1,15 +1,34 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+import os
+from pathlib import Path
+
+# Set model directory relative to project root
+MODEL_DIR = Path(__file__).parent.parent.parent / "models" / "models--Qwen--Qwen2-0.5B-Instruct" / "snapshots"
+
+def get_local_model_path():
+    """Get the local model path from snapshots folder"""
+    if MODEL_DIR.exists():
+        # Get the first (usually only) snapshot folder
+        snapshots = list(MODEL_DIR.iterdir())
+        if snapshots:
+            return str(snapshots[0])
+    return None
 
 def load_model(model_name="Qwen/Qwen2-0.5B-Instruct"):
-    print(f"[LLM] Loading model: {model_name}")
+    local_path = get_local_model_path()
     
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-        device_map="auto" if torch.cuda.is_available() else None
-    )
+    if local_path:
+        print(f"[LLM] Loading model from local: models/")
+        tokenizer = AutoTokenizer.from_pretrained(local_path, local_files_only=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            local_path,
+            local_files_only=True,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            device_map="auto" if torch.cuda.is_available() else None
+        )
+    else:
+        raise FileNotFoundError(f"Model not found locally. Download using -> |from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen2-0.5B-Instruct', cache_dir='desiredLocation')|")
     
     # Set pad token if not set
     if tokenizer.pad_token is None:
@@ -17,8 +36,8 @@ def load_model(model_name="Qwen/Qwen2-0.5B-Instruct"):
     
     return tokenizer, model
 
-def run_inference(text, tokenizer, model, stream=True):
-    # Qwen2 chat format
+def run_inference(text, tokenizer, model):
+    # chat format
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": text}
@@ -30,17 +49,11 @@ def run_inference(text, tokenizer, model, stream=True):
     device = next(model.parameters()).device
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     
-    # Create streamer for real-time output
-    streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True) if stream else None
-    
     output_ids = model.generate(
         **inputs,
         max_new_tokens=256,
-        do_sample=True,
-        temperature=0.7,
-        top_p=0.9,
         pad_token_id=tokenizer.pad_token_id,
-        streamer=streamer
+        eos_token_id=tokenizer.eos_token_id
     )
     
     # Decode only the new tokens (exclude input)
