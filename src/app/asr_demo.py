@@ -23,7 +23,7 @@ class AudioRecorder:
     def __init__(self):
         self.recording = False
         self.audio_data = []
-        self.start_time = None
+        self.start_time: float | None = None
         
     def start_recording(self):
         self.recording = True
@@ -47,7 +47,12 @@ class AudioRecorder:
         # Auto-stop thread after MAX_DURATION
         def auto_stop():
             while self.recording:
-                elapsed = time.time() - self.start_time
+                st = self.start_time
+                if st is None:
+                    # Start time not set yet; wait briefly and retry
+                    time.sleep(0.05)
+                    continue
+                elapsed = time.time() - st
                 if elapsed >= MAX_DURATION:
                     print(f"\n[REC] Max duration ({MAX_DURATION}s) reached.")
                     self.stop_recording()
