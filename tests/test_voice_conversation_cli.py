@@ -108,7 +108,7 @@ def run_pipeline_from_audio(
     llm_output = llm_service.generate(LLMRequest(text=asr_result.text))
     logger.info("LLM generation completed.")
 
-    return asr_result, llm_output
+    return asr_result, llm_output.text
 
 
 def start_conversation() -> None:
