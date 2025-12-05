@@ -15,7 +15,7 @@ from local_llm_test import load_model as load_llm, run_inference
 
 # Recording settings
 SAMPLE_RATE = 16000  # Whisper expects 16kHz
-MAX_DURATION = 15    # Max recording length in seconds
+MAX_DURATION = 30    # Max recording length in seconds
 CHANNELS = 1
 AUDIO_DIR = Path(__file__).parent / "audio"
 
@@ -145,7 +145,7 @@ def main():
                         print("[LLM] Generating response...")
                         llm_response = run_inference(text, llm_tokenizer, llm_model)
                         print("\n" + "=" * 40)
-                        print("LLM RESPONSE:")
+                        print("Qwen's Response:")
                         print(llm_response)
                         print("=" * 40 + "\n")
                         

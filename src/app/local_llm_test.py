@@ -58,7 +58,7 @@ def run_inference(text, tokenizer, model):
     
     output_ids = model.generate(
         **inputs,
-        max_new_tokens=60,
+        max_new_tokens=80,
         num_beams=1,
         do_sample=False,
         use_cache=True,
