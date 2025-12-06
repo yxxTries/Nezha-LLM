@@ -56,9 +56,9 @@ class LLMService:
         prompt_key = request.prompt_key or DEFAULT_PROMPT_KEY
         template = PROMPT_TEMPLATES.get(prompt_key, PROMPT_TEMPLATES[DEFAULT_PROMPT_KEY])
         prompt = template.format(
-            instruction="",
+            instruction=self._config.instruction_prompt,
             input=base_text,
-            system="You are a helpful assistant.",
+            system=self._config.system_prompt,
             user=base_text,
         )
 
@@ -107,18 +107,3 @@ class LLMService:
 
         return LLMResponse(text=generated_text)
 
-    def generate_from_text(
-        self,
-        text: str,
-        *,
-        max_new_tokens: int | None = None,
-        temperature: float | None = None,
-    ) -> LLMResponse:
-        """Convenience wrapper that accepts raw text instead of an LLMRequest.
-
-        This is the method you are most likely to call from the ASR/UI pipeline:
-
-            response = llm_service.generate_from_text(transcribed_text)
-        """
-        request = LLMRequest(text=text, max_new_tokens=max_new_tokens, temperature=temperature)
-        return self.generate(request)

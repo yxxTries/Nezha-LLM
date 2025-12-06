@@ -47,6 +47,13 @@ async def asr_llm(
 
         asr_res = asr.transcribe_file(str(tmp))
         transcript = asr_res.text.strip()
+
+        # Guard: empty or too-short audio -> skip LLM
+        min_duration_s = 0.3
+        if not transcript or (getattr(asr_res, "duration", 0.0) or 0.0) < min_duration_s:   
+            msg = "No speech detected; please try again."
+            return ASRLLMReply(text=msg, transcript=transcript, timestamp=utcnow())
+
         req = LLMRequest(text=transcript)
         llm_res = llm.generate(req)
 

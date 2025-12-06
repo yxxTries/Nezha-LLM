@@ -87,6 +87,9 @@ function appendMessage(role, text, ts) {
 
   chatContainer.appendChild(wrapper);
   chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  // Return the wrapper so callers can update it later (e.g., replacing placeholders)
+  return wrapper;
 }
 
 // Error handling
@@ -106,6 +109,7 @@ async function handleTextSubmit(event) {
   if (!message) return;
 
   appendMessage("user", message, new Date());
+  let placeholder = appendMessage("assistant", "[Thinking…]", new Date());
   textInput.value = "";
   textInput.disabled = true;
 
@@ -124,11 +128,23 @@ async function handleTextSubmit(event) {
 
     const data = await res.json();
     const { text, timestamp } = extractTextAndTimestamp(data);
-
-    appendMessage("assistant", text || "[empty response]", timestamp);
+    if (placeholder) {
+      const body = placeholder.querySelector(".message-text");
+      if (body) body.textContent = text || "[empty response]";
+      const timeSpan = placeholder.querySelector(".message-timestamp");
+      if (timeSpan) timeSpan.textContent = formatTimestamp(timestamp || new Date());
+      placeholder = null;
+    } else {
+      appendMessage("assistant", text || "[empty response]", timestamp);
+    }
   } catch (err) {
     console.error(err);
     setError(err.message || "Failed to send text message.");
+    if (placeholder) {
+      const body = placeholder.querySelector(".message-text");
+      if (body) body.textContent = "[error: " + (err.message || "text failed") + "]";
+      placeholder = null;
+    }
   } finally {
     textInput.disabled = false;
     textInput.focus();
@@ -190,7 +206,7 @@ async function sendAudioToServer(audioBlob) {
     return;
   }
 
-  appendMessage("user", "[Voice message]", new Date());
+  const userBubble = appendMessage("user", "[Voice message]", new Date());
 
   const formData = new FormData();
   // Backend: expect field name "audio" or change as needed
@@ -208,10 +224,23 @@ async function sendAudioToServer(audioBlob) {
 
     const data = await res.json();
     const { text, timestamp } = extractTextAndTimestamp(data);
+
+    // If backend returns transcript, update the original user bubble
+    if (data && data.transcript && userBubble) {
+      const body = userBubble.querySelector(".message-text");
+      if (body) body.textContent = `${data.transcript || "[no transcript]"} (transcribed from audio)`;
+      const timeSpan = userBubble.querySelector(".message-timestamp");
+      if (timeSpan) timeSpan.textContent = formatTimestamp(timestamp || new Date());
+    }
+
     appendMessage("assistant", text || "[empty response]", timestamp);
   } catch (err) {
     console.error(err);
     setError(err.message || "Failed to send audio message.");
+    if (userBubble) {
+      const body = userBubble.querySelector(".message-text");
+      if (body) body.textContent = "[error: " + (err.message || "audio failed") + "]";
+    }
   }
 }
 

@@ -75,18 +75,6 @@ def test_generate_uses_overrides_for_parameters() -> None:
     assert model.generate_called_with["temperature"] == 0.5
 
 
-def test_generate_from_text_is_convenience_wrapper() -> None:
-    config = LLMConfig()
-    tokenizer = DummyTokenizer()
-    model = DummyModel()
-    service = LLMService(config=config, model=model, tokenizer=tokenizer)
-
-    response = service.generate_from_text("Hi there")
-
-    assert response.text == "dummy_response"
-    assert tokenizer.last_input == "Hi there"
-
-
 def test_llm_runtime_with_real_model() -> None:
     """Runtime test that loads the actual model and generates a response.
     

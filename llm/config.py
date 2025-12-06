@@ -23,6 +23,8 @@ class LLMConfig:
     temperature: float = 0.3
     top_p: float = 0.9
     repetition_penalty: float = 1.0
+    system_prompt: str = "You are a helpful assistant."
+    instruction_prompt: str = ""
 
 
 DEFAULT_LLM_CONFIG = LLMConfig()
