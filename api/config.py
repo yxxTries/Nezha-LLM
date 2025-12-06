@@ -16,6 +16,6 @@ class APISettings(BaseSettings):
     cors_allow_headers: List[str] = ["*"]
 
     class Config:
-        env_prefix = "AUDIOGPT_API_"
+        env_prefix = "NEZHA_LLM_API_"
 
 settings = APISettings()

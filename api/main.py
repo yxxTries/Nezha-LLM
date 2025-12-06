@@ -18,7 +18,7 @@ LOG_CONFIG = {
 
 def create_app() -> FastAPI:
     dictConfig(LOG_CONFIG)
-    app = FastAPI(title="AudioGPT Local API")
+    app = FastAPI(title="Nezha-LLM Local API")
     app.add_middleware(CORSMiddleware,
                        allow_origins=settings.cors_allow_origins,
                        allow_credentials=settings.cors_allow_credentials,

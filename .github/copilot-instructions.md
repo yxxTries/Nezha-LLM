@@ -1,4 +1,4 @@
-# AudioGPT – Copilot Instructions
+# Nezha-LLM – Copilot Instructions
 
 - **What it is**: Local voice→text→LLM stack. FastAPI (`api/`) wraps ASR (`asr/` faster-whisper + ffmpeg) and LLM (`llm/` Qwen) with a static JS UI (`ui/`). No persistence; temp audio files are deleted after each request.
 
@@ -8,7 +8,7 @@
   - Swagger/Redoc at `/docs` and `/redoc` once the API is up.
 
 - **Configuration knobs**
-  - API settings via env prefix `AUDIOGPT_API_` (`host`, `port`, CORS, `log_level`), defined in `api/config.py`.
+  - API settings via env prefix `NEZHA_LLM_API_` (`host`, `port`, CORS, `log_level`), defined in `api/config.py`.
   - ASR env vars in `asr/config.py`: `ASR_MODEL_NAME` (default `tiny`), `ASR_DEVICE` (`cpu`/`cuda`), `ASR_COMPUTE_TYPE` (`int8`), `ASR_SAMPLE_RATE` (16000), `ASR_BEAM_SIZE`, `ASR_VAD_FILTER`, `ASR_LANGUAGE`.
   - LLM defaults live in `llm/config.py` (`LLMConfig`): model dir points to `models/models--Qwen--Qwen2-0.5B-Instruct/snapshots/c540...`, `device="auto"` (prefers CUDA), `load_in_4bit=True`, temperature/top_p/max_new_tokens defaults, prompt templates (`PROMPT_TEMPLATES`, default key `default`). Adjust by passing a custom `LLMConfig` when constructing `LLMService`.
 

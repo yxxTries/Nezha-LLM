@@ -6,7 +6,7 @@ A local LLM/voice-to-LLM application that transcribes audio using Whisper and ge
 ## Project Structure
 
 ```
-AudioGPT/
+Nezha-LLM/
 ├── api/          # FastAPI server (REST endpoints)
 ├── asr/          # Automatic Speech Recognition (faster-whisper)
 ├── llm/          # Local LLM service (Qwen)
@@ -34,8 +34,8 @@ scipy>=1.16.0
 
 ```bash
 # Clone the repository
-git clone https://github.com/yxxTries/AudioGPT.git
-cd AudioGPT
+git clone https://github.com/yxxTries/Nezha-LLM.git
+cd Nezha-LLM
 
 # Create virtual environment
 python -m venv .venv
