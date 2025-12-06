@@ -28,7 +28,14 @@ class LLMService:
         self._config = config or DEFAULT_LLM_CONFIG
 
         if model is None or tokenizer is None:
-            loader = QwenModelLoader(self._config.model_dir, device=self._config.device)
+            loader = QwenModelLoader(
+                self._config.model_dir,
+                device=self._config.device,
+                load_in_8bit=self._config.load_in_8bit,
+                load_in_4bit=self._config.load_in_4bit,
+                cpu_dtype=self._config.cpu_dtype,
+                cuda_dtype=self._config.cuda_dtype,
+            )
             tokenizer, model = loader.load()
 
         self._model = model
@@ -82,6 +89,11 @@ class LLMService:
 
         # Tokenize input
         inputs = self._tokenizer(prompt, return_tensors="pt")
+
+        # Move inputs to model device if applicable
+        model_device = getattr(self._model, "device", None)
+        if model_device:
+            inputs = {k: v.to(model_device) for k, v in inputs.items()}
 
         # Generate output token ids
         outputs = self._model.generate(

@@ -18,13 +18,17 @@ class LLMConfig:
     """
 
     model_dir: Path = Path("models") / "models--Qwen--Qwen2-0.5B-Instruct" / "snapshots" / "c540970f9e29518b1d8f06ab8b24cba66ad77b6d"
-    device: str = "cpu"
-    max_new_tokens: int = 128
-    temperature: float = 0.3
+    device: str = "auto"  # "auto" picks CUDA if available, else CPU
+    max_new_tokens: int = 256
+    temperature: float = 0.25
     top_p: float = 0.9
     repetition_penalty: float = 1.0
     system_prompt: str = "You are a helpful assistant."
     instruction_prompt: str = ""
+    load_in_8bit: bool = False
+    load_in_4bit: bool = True
+    cpu_dtype: str = "float32"  # used when running on CPU to avoid slow float16 emulation
+    cuda_dtype: str = "float16"  # used when running on CUDA
 
 
 DEFAULT_LLM_CONFIG = LLMConfig()
