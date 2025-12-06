@@ -1,6 +1,7 @@
-# AudioGPT
+# Nezha-LLM
+Made for personal use
 
-A local voice-to-LLM application that transcribes audio using Whisper and generates responses with a local Qwen model.
+A local LLM/voice-to-LLM application that transcribes audio using Whisper and generates responses with a local LLM model.
 
 ## Project Structure
 
