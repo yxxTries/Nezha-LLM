@@ -61,4 +61,10 @@ Once running, access the interactive docs at:
 - `POST /api/llm` - Send text to LLM
 - `POST /api/asr-llm` - Upload audio for transcription + LLM response
 
--Built by Amil
+## Privacy
+
+- No user text or LLM responses are persisted to disk or any database.
+- Uploaded audio for `/api/asr-llm` is written to a temporary file only for transcription and is deleted immediately after processing.
+- The web UI does not use `localStorage` or `sessionStorage`; chat messages exist only in memory and disappear on refresh.
+
+Built by Amil
